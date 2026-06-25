@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>حاسبة التمويل — أقصى مبلغ · القسط · السداد المبكر</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@500;600;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#11212B;--ink-2:#1B3340;--paper:#F4F2EC;--card:#FFFFFF;--line:#E3E0D6;--muted:#6B7A82;
+  --teal:#0B6E55;--teal-soft:#E5F1EC;--brass:#9A7B2E;--brass-soft:#F3ECD9;
+  --amber:#B5530E;--amber-soft:#FBEBDD;--red:#B3261E;--red-soft:#FBE7E5;--green:#0B6E55;
+  --radius:16px;--shadow:0 1px 2px rgba(17,33,43,.06),0 8px 24px rgba(17,33,43,.06);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{font-family:"IBM Plex Sans Arabic",system-ui,sans-serif;background:var(--paper);color:var(--ink);line-height:1.6;padding-bottom:60px}
+.num{font-feature-settings:"tnum" 1;letter-spacing:.2px}
+.head{background:linear-gradient(160deg,#16303C,#11212B);color:#fff;padding:34px 22px 28px;position:relative;overflow:hidden}
+.head::after{content:"";position:absolute;inset:0;background:radial-gradient(120px 120px at 92% -10%,rgba(154,123,46,.28),transparent 60%),radial-gradient(160px 160px at 100% 120%,rgba(11,110,85,.30),transparent 60%);pointer-events:none}
+.head .wrap{max-width:760px;margin:0 auto;position:relative;z-index:1}
+.eyebrow{font-size:12px;letter-spacing:2px;color:#9DB6BE;font-weight:500;text-transform:uppercase;margin-bottom:8px}
+.head h1{font-family:"Reem Kufi",sans-serif;font-weight:700;font-size:30px;line-height:1.25;margin-bottom:6px}
+.head p{color:#B9CDD3;font-size:14.5px;max-width:48ch;font-weight:300}
+.wrap{max-width:760px;margin:0 auto;padding:0 18px}
+.stage{margin-top:-18px;position:relative;z-index:2}
+.seg{display:flex;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:5px;box-shadow:var(--shadow);gap:2px}
+.seg button{flex:1;border:0;background:transparent;cursor:pointer;font-family:inherit;font-size:13.5px;font-weight:600;color:var(--muted);padding:11px 6px;border-radius:999px;transition:.2s}
+.seg button.on{background:var(--ink);color:#fff}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px;margin-top:16px}
+.card h2{font-family:"Reem Kufi",sans-serif;font-size:17px;font-weight:600;display:flex;align-items:center;gap:9px;margin-bottom:4px}
+.card h2 .dot{width:9px;height:9px;border-radius:50%;background:var(--teal)}
+.card .sub{color:var(--muted);font-size:13px;margin-bottom:16px}
+.field{margin-bottom:14px}.field:last-child{margin-bottom:0}
+.field label{display:block;font-size:13.5px;font-weight:500;margin-bottom:7px;color:#36474F}
+.field .hint{color:var(--muted);font-weight:400;font-size:12px}
+.input{position:relative;display:flex;align-items:center;border:1.5px solid var(--line);border-radius:12px;background:#FCFBF8;transition:.15s;overflow:hidden}
+.input:focus-within{border-color:var(--teal);background:#fff;box-shadow:0 0 0 3px rgba(11,110,85,.10)}
+.input input{flex:1;border:0;background:transparent;outline:0;width:100%;font-family:inherit;font-size:16px;font-weight:600;color:var(--ink);padding:12px 14px;font-feature-settings:"tnum" 1}
+.input .unit{padding:0 14px;color:var(--muted);font-size:13px;font-weight:500;border-inline-start:1px solid var(--line);align-self:stretch;display:flex;align-items:center;background:#F4F2EC}
+.rangewrap{display:flex;align-items:center;gap:12px;margin-top:8px}
+.rangewrap input[type=range]{flex:1;accent-color:var(--teal);height:4px}
+.pill{font-size:13px;font-weight:700;color:var(--teal);background:var(--teal-soft);padding:5px 12px;border-radius:999px;min-width:64px;text-align:center;font-feature-settings:"tnum" 1}
+.choice{display:flex;gap:8px}
+.choice button{flex:1;border:1.5px solid var(--line);background:#FCFBF8;border-radius:11px;padding:10px;font-family:inherit;font-size:13.5px;font-weight:600;color:var(--muted);cursor:pointer;transition:.15s}
+.choice button.on{border-color:var(--teal);background:var(--teal-soft);color:var(--teal)}
+.hero{background:linear-gradient(165deg,#fff,var(--brass-soft) 140%);border:1px solid #EAD9A8}
+.hero .label{font-size:13.5px;color:#7A6B3E;font-weight:600;margin-bottom:4px}
+.hero .big{font-family:"Reem Kufi",sans-serif;font-weight:700;color:var(--brass);font-size:clamp(34px,9vw,52px);line-height:1.05;letter-spacing:-.5px;font-feature-settings:"tnum" 1}
+.hero .big small{font-size:.42em;font-weight:600;color:#9A8A52;margin-inline-start:6px}
+.hero .meta{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:14px;padding-top:14px;border-top:1px dashed #E6D8AE}
+.hero .meta div{font-size:13px;text-align:right;min-width:0}
+.hero .meta span{display:block;color:#8A7B4E;font-size:11.5px;margin-bottom:3px;line-height:1.35}
+.hero .meta b{font-size:16px;font-weight:700;color:var(--ink);font-feature-settings:"tnum" 1;direction:ltr;display:block}
+/* SAMA gauge */
+.sama{border-inline-start:5px solid var(--green)}
+.sama.warn{border-inline-start-color:var(--amber)}
+.sama.over{border-inline-start-color:var(--red)}
+.sama .statusrow{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.badge{font-size:13px;font-weight:700;padding:6px 13px;border-radius:999px}
+.badge.ok{background:var(--teal-soft);color:var(--green)}
+.badge.warn{background:var(--amber-soft);color:var(--amber)}
+.badge.over{background:var(--red-soft);color:var(--red)}
+.gauge{height:14px;border-radius:999px;background:linear-gradient(90deg,#E5F1EC 0%,#E5F1EC 60%,#FBEBDD 60%,#FBEBDD 82%,#FBE7E5 82%);position:relative;overflow:visible;margin:14px 0 8px}
+.gauge .mark{position:absolute;top:-5px;width:3px;height:24px;background:var(--ink);border-radius:2px;transition:right .5s cubic-bezier(.22,1,.36,1)}
+.gauge .seam{position:absolute;top:-3px;width:2px;height:20px;background:rgba(17,33,43,.25)}
+.glabels{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);font-feature-settings:"tnum" 1}
+.samamsg{font-size:13px;margin-top:12px;line-height:1.7;padding:12px;border-radius:11px;background:#F8F7F2}
+.samamsg b{font-feature-settings:"tnum" 1}
+.truecost{background:linear-gradient(160deg,#fff,#FBF6EE)}
+.bar{margin-bottom:14px}
+.bar .top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+.bar .top .n{font-size:13.5px;font-weight:600;color:#36474F}
+.bar .top .v{font-size:15px;font-weight:700;font-feature-settings:"tnum" 1}
+.track{height:12px;background:#EEE9DC;border-radius:999px;overflow:hidden}
+.fill{height:100%;border-radius:999px;width:0;transition:width .9s cubic-bezier(.22,1,.36,1)}
+.fill.flat{background:linear-gradient(90deg,#C6A445,#9A7B2E)}
+.fill.apr{background:linear-gradient(90deg,#D67A33,#B5530E)}
+.mult{display:inline-flex;align-items:center;gap:8px;margin-top:6px;background:var(--amber-soft);color:var(--amber);font-weight:700;padding:9px 14px;border-radius:12px;font-size:14px}
+.mult b{font-size:18px;font-feature-settings:"tnum" 1}
+.note{font-size:12.5px;color:var(--muted);margin-top:12px;line-height:1.65}
+.tbl{width:100%;border-collapse:collapse;font-size:14.5px;table-layout:auto}
+.tbl tr{border-bottom:1px solid var(--line)}.tbl tr:last-child{border-bottom:0}
+.tbl td{padding:12px 0;vertical-align:baseline}
+.tbl td:first-child{color:#46555C;font-weight:500;text-align:right;padding-inline-end:16px}
+.tbl td:last-child{text-align:right;font-weight:700;white-space:nowrap;width:1%}
+.tbl .v{font-feature-settings:"tnum" 1;direction:ltr;unicode-bidi:isolate;display:inline-block}
+.tbl .vrtl{direction:rtl;display:inline-block}
+.tbl .v .u{color:var(--muted);font-weight:500;font-size:.82em;margin-inline-start:4px}
+.tbl tr.total td{font-weight:700;color:var(--ink)}.tbl tr.total td:last-child .v{color:var(--teal);font-size:16px}
+.tbl .tag{font-size:11px;color:var(--muted);font-weight:400;display:block}
+.tbl tr.save td:last-child .v{color:var(--green)}
+.tbl tr.verdict td{padding-top:14px;font-weight:600;line-height:1.7;color:var(--ink);text-align:right}
+.actions{display:flex;gap:10px;margin-top:18px}
+.btn{flex:1;border:1.5px solid var(--line);background:#fff;color:var(--ink);font-family:inherit;font-weight:600;font-size:14px;padding:13px;border-radius:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;transition:.15s}
+.btn:hover{border-color:var(--ink)}.btn.primary{background:var(--ink);color:#fff;border-color:var(--ink)}
+.foot{text-align:center;color:var(--muted);font-size:12px;margin-top:26px;line-height:1.7}
+.hidden{display:none}
+@media(max-width:480px){.card{padding:16px}.hero .meta{gap:14px}}
+@media print{
+  @page{size:A4 portrait;margin:8mm}
+  html,body{background:#fff;padding:0;margin:0;font-size:10.5px;line-height:1.4}
+  .seg,.actions,.foot{display:none!important}
+  #cfgCard{display:none!important}
+  .head{background:#11212B!important;padding:14px 16px!important;border-radius:0}
+  .head::after{display:none}
+  .head h1{font-size:18px;margin-bottom:2px}
+  .head .eyebrow{font-size:9px;margin-bottom:3px}
+  .head p{font-size:10px}
+  main.stage{margin-top:10px!important}
+  .wrap{padding:0 4px;max-width:100%}
+  /* collapse all cards into a tight, gap-free, page-safe flow */
+  .card{box-shadow:none!important;border:1px solid #D8D5CB!important;border-radius:8px;
+    padding:10px 12px!important;margin-top:8px!important;break-inside:avoid;page-break-inside:avoid}
+  .card h2{font-size:12.5px;margin-bottom:2px}
+  .card .sub{font-size:9.5px;margin-bottom:8px}
+  .field{margin-bottom:7px}
+  .input{border-width:1px}
+  .input input{padding:6px 9px;font-size:11px}
+  .input .unit{padding:0 9px;font-size:9.5px}
+  .rangewrap{margin-top:4px}
+  .choice button{padding:6px}
+  /* hero */
+  .hero .big{font-size:30px}
+  .hero .meta{gap:8px;margin-top:8px;padding-top:8px}
+  .hero .meta b{font-size:12px}
+  .hero .meta span{font-size:9px}
+  /* SAMA + true cost compact */
+  .gauge{margin:8px 0 5px}
+  .samamsg{padding:8px;font-size:10px;margin-top:8px}
+  .bar{margin-bottom:8px}
+  .mult{padding:6px 10px;font-size:11px;margin-top:3px}
+  .note{font-size:9.5px;margin-top:7px}
+  /* table */
+  .tbl{font-size:11px}
+  .tbl td{padding:6px 0}
+  /* avoid splitting a card across pages but keep flow tight */
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+</style>
+</head>
+<body>
+<header class="head"><div class="wrap">
+  <div class="eyebrow">FINANCING CALCULATOR</div>
+  <h1>حاسبة التمويل الذكية</h1>
+  <p>أقصى مبلغ · القسط لمبلغ معيّن · السداد المبكر — مع حدود ساما الرسمية وكشف التكلفة الفعلية (APR).</p>
+</div></header>
+
+<main class="wrap stage">
+  <div class="seg" role="tablist">
+    <button id="tabMax" class="on" onclick="setMode('max')">أقصى مبلغ</button>
+    <button id="tabInst" onclick="setMode('inst')">قسط مبلغ معيّن</button>
+    <button id="tabPay" onclick="setMode('pay')">سداد مبكر</button>
+  </div>
+
+  <!-- ===== shared status: employment + finance type ===== -->
+  <section class="card" id="cfgCard">
+    <h2><span class="dot"></span> المعطيات</h2>
+    <div class="sub">عدّل القيم وتتحدث النتائج فورًا.</div>
+
+    <div class="field" id="f_emp">
+      <label>الحالة الوظيفية <span class="hint">(تحدد حد ساما)</span></label>
+      <div class="choice">
+        <button id="empE" class="on" onclick="setEmp('emp')">موظف · 33.33%</button>
+        <button id="empR" onclick="setEmp('ret')">متقاعد · 25%</button>
+      </div>
+    </div>
+    <div class="field" id="f_ftype">
+      <label>نوع التمويل</label>
+      <div class="choice">
+        <button id="ftP" class="on" onclick="setFtype('personal')">شخصي</button>
+        <button id="ftR" onclick="setFtype('realestate')">عقاري</button>
+      </div>
+    </div>
+
+    <div class="field" id="f_salary">
+      <label>صافي الراتب الشهري <span class="hint">(بعد الاستقطاعات الحكومية)</span></label>
+      <div class="input"><input id="salary" placeholder="مثال: 50000" type="number" inputmode="decimal" value=""><span class="unit">ريال</span></div>
+    </div>
+    <div class="field" id="f_dbr">
+      <label>القسط المطلوب كنسبة من الراتب</label>
+      <div class="rangewrap"><input id="dbr" type="range" min="5" max="70" step="0.01" value="33.33" oninput="calc()"><span class="pill"><span id="dbrPill">33.33</span>%</span></div>
+    </div>
+    <div class="field hidden" id="f_amount">
+      <label>مبلغ التمويل المطلوب</label>
+      <div class="input"><input id="amount" placeholder="مثال: 500000" type="number" inputmode="decimal" value=""><span class="unit">ريال</span></div>
+    </div>
+    <div class="field" id="f_cc">
+      <label>قسط بطاقة ائتمانية شهري <span class="hint">(إن وُجد)</span></label>
+      <div class="input"><input id="cc" placeholder="0" type="number" inputmode="decimal" value=""><span class="unit">ريال</span></div>
+    </div>
+    <div class="field" id="f_other">
+      <label>استقطاعات / التزامات أخرى شهرية</label>
+      <div class="input"><input id="other" placeholder="0" type="number" inputmode="decimal" value=""><span class="unit">ريال</span></div>
+    </div>
+    <div class="field" id="f_rate">
+      <label>هامش الربح السنوي (Flat) <span class="hint">ثابت على كامل المبلغ</span></label>
+      <div class="rangewrap"><input id="rate" type="range" min="0.5" max="8" step="0.01" value="2.00" oninput="calc()"><span class="pill"><span id="ratePill">1.77</span>%</span></div>
+    </div>
+    <div class="field" id="f_years">
+      <label>مدة التمويل</label>
+      <div class="rangewrap"><input id="years" type="range" min="1" max="30" step="1" value="5" oninput="calc()"><span class="pill"><span id="yearsPill">5</span> سنة</span></div>
+      <div class="hint" style="margin-top:6px">= <span id="monthsTxt" class="num">60</span> شهر</div>
+    </div>
+
+    <!-- ===== Early-settlement inputs ===== -->
+    <div id="payInputs" class="hidden">
+      <div class="field"><label>مبلغ التمويل الأصلي <span class="hint">(قيمة السلع المُحوّلة)</span></label>
+        <div class="input"><input id="p_principal" placeholder="مبلغ التمويل الأصلي" type="number" inputmode="decimal" value="" oninput="calc()"><span class="unit">ريال</span></div></div>
+      <div class="field"><label>القسط الشهري</label>
+        <div class="input"><input id="p_inst" placeholder="القسط الشهري" type="number" inputmode="decimal" value="" oninput="calc()"><span class="unit">ريال</span></div></div>
+      <div class="field"><label>إجمالي عدد الأقساط</label>
+        <div class="input"><input id="p_total" placeholder="مثال: 60" type="number" inputmode="numeric" value="" oninput="calc()"><span class="unit">قسط</span></div></div>
+      <div class="field"><label>الأقساط المدفوعة حتى الآن</label>
+        <div class="input"><input id="p_paid" placeholder="مثال: 19" type="number" inputmode="numeric" value="" oninput="calc()"><span class="unit">قسط</span></div></div>
+      <div class="field"><label>عائد استثمار بديل سنوي <span class="hint">(لو أبقيت السيولة بدل الإقفال — TASI مثلاً)</span></label>
+        <div class="rangewrap"><input id="p_yield" type="range" min="0" max="20" step="0.1" value="8" oninput="calc()"><span class="pill"><span id="yieldPill">8.0</span>%</span></div></div>
+    </div>
+  </section>
+
+  <!-- ===== SAMA gauge ===== -->
+  <section class="card sama" id="samaCard">
+    <h2><span class="dot"></span> حد ساما — نسبة الاستقطاع</h2>
+    <div class="statusrow"><span class="badge ok" id="samaBadge">ضمن الحد</span><span style="font-size:13px;color:var(--muted)">نسبتك الحالية <b id="samaPct" class="num">0%</b></span></div>
+    <div class="gauge"><span class="seam" id="seam1" style="right:60%"></span><span class="seam" id="seam2" style="right:82%"></span><span class="mark" id="samaMark" style="right:0%"></span></div>
+    <div class="glabels"><span>0%</span><span>الحد الأعلى</span><span>70%</span></div>
+    <div class="samamsg" id="samaMsg"></div>
+  </section>
+
+  <!-- ===== Hero ===== -->
+  <section class="card hero">
+    <div class="label" id="heroLabel">مبلغ التمويل الأقصى</div>
+    <div class="big"><span id="heroBig" class="num">0</span><small>ريال</small></div>
+    <div class="meta">
+      <div><span id="m1Lbl">القسط الشهري</span><b id="m1" class="num">0</b></div>
+      <div><span id="m2Lbl">إجمالي السداد</span><b id="m2" class="num">0</b></div>
+      <div><span id="m3Lbl">تكلفة الأرباح</span><b id="m3" class="num">0</b></div>
+    </div>
+  </section>
+
+  <!-- ===== True cost (hidden in pay mode handled by JS) ===== -->
+  <section class="card truecost" id="tcCard">
+    <h2><span class="dot" style="background:var(--amber)"></span> التكلفة الفعلية للتمويل</h2>
+    <div class="sub">الرقم المعلن مقابل الرقم الصادق — هذا ما يلزم البنك بإظهاره نظاميًا.</div>
+    <div class="bar"><div class="top"><span class="n">المعدل المعلن (Flat)</span><span class="v" style="color:var(--brass)"><span id="flatV" class="num">0</span>%</span></div><div class="track"><div class="fill flat" id="flatBar"></div></div></div>
+    <div class="bar"><div class="top"><span class="n">المعدل الفعلي (APR)</span><span class="v" style="color:var(--amber)"><span id="aprV" class="num">0</span>%</span></div><div class="track"><div class="fill apr" id="aprBar"></div></div></div>
+    <div class="mult">التكلفة الحقيقية أعلى بـ <b id="multV" class="num">0×</b> من الرقم المعلن</div>
+    <p class="note">تسدد المبلغ تدريجيًا فينخفض رصيدك كل شهر، وتستفيد فعليًا من نصف المبلغ تقريبًا طوال المدة. لكن الـ Flat يحسب الربح على كامل المبلغ الأصلي. الـ APR هو تكلفتك الحقيقية.</p>
+  </section>
+
+  <!-- ===== Breakdown ===== -->
+  <section class="card">
+    <h2><span class="dot" style="background:var(--ink)"></span> التفاصيل الكاملة</h2>
+    <table class="tbl"><tbody id="breakdown"></tbody></table>
+    <div class="actions">
+      <button class="btn primary" onclick="window.print()">🖨️ طباعة / حفظ PDF</button>
+      <button class="btn" onclick="resetAll()">↺ إعادة تعيين</button>
+    </div>
+  </section>
+
+  <p class="foot">
+    حدود ساما: التمويل الشخصي 33.33% للموظف · 25% للمتقاعد · إجمالي الالتزامات غير العقارية ≤45% · شاملة العقاري ≤55%.<br>
+    الأرقام إرشادية — العرض ومبلغ الإقفال النهائي من البنك قد يختلفان. الـ APR محسوب على الرصيد المتناقص.
+  </p>
+</main>
+
+<script>
+let mode='max', emp='emp', ftype='personal';
+const $=id=>document.getElementById(id);
+const fmt=(n,d=2)=>isFinite(n)?Number(n).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d}):'—';
+
+function setMode(m){
+  mode=m;
+  $('tabMax').classList.toggle('on',m==='max');
+  $('tabInst').classList.toggle('on',m==='inst');
+  $('tabPay').classList.toggle('on',m==='pay');
+  const pay=m==='pay';
+  // toggle field visibility
+  $('f_dbr').classList.toggle('hidden', m!=='max');
+  $('f_amount').classList.toggle('hidden', m!=='inst');
+  ['f_emp','f_ftype','f_salary','f_cc','f_other','f_rate','f_years'].forEach(f=>$(f).classList.toggle('hidden',pay));
+  $('payInputs').classList.toggle('hidden',!pay);
+  $('samaCard').classList.toggle('hidden',pay);
+  $('tcCard').classList.toggle('hidden',pay);
+  // in inst mode salary still useful for SAMA gauge
+  if(m==='inst'){$('f_salary').classList.remove('hidden');}
+  calc();
+}
+function setEmp(e){emp=e;$('empE').classList.toggle('on',e==='emp');$('empR').classList.toggle('on',e==='ret');calc();}
+function setFtype(t){ftype=t;$('ftP').classList.toggle('on',t==='personal');$('ftR').classList.toggle('on',t==='realestate');
+  if(t==='realestate'&&parseInt($('years').value)<10){$('years').value=20;}calc();}
+
+function solveR(P,A,N){if(A*N<=P)return 0;let lo=1e-9,hi=1;for(let i=0;i<260;i++){const r=(lo+hi)/2;const pay=P*r/(1-Math.pow(1+r,-N));if(pay>A)hi=r;else lo=r;}return (lo+hi)/2;}
+
+// wrap a value string for clean RTL alignment: numbers isolated LTR, Arabic phrases kept RTL
+function cellVal(v){
+  if(/[\u0600-\u06FF]/.test(v) && !v.includes('﷼')) return '<span class="vrtl">'+v+'</span>';
+  v=v.replace(/\s*﷼$/,'<span class="u">﷼</span>');
+  return '<span class="v">'+v+'</span>';
+}
+function rowsHTML(rows){return rows.map(r=>`<tr><td>${r[0]}</td><td>${cellVal(r[1])}</td></tr>`).join('');}
+
+function samaCaps(){
+  // personal/consumer installment cap
+  const personalCap = emp==='emp'?33.33:25;
+  // total obligations cap
+  const totalCap = ftype==='realestate'?55:45;
+  return {personalCap,totalCap};
+}
+
+function updateSama(installment, otherObligations){
+  const salary=parseFloat($('salary').value)||0;
+  if(salary<=0){$('samaPct').textContent='—';$('samaMsg').textContent='أدخل صافي الراتب لعرض حد ساما.';return;}
+  const {personalCap,totalCap}=samaCaps();
+  const thisPct=installment/salary*100;
+  const totalPct=(installment+otherObligations)/salary*100;
+  const cap = ftype==='realestate'?totalCap:personalCap;
+  $('samaPct').textContent=thisPct.toFixed(2)+'%';
+  // gauge mark (0..70 scale), seams at personalCap & totalCap mapped
+  const scale=70;
+  $('samaMark').style.right=Math.min(100,totalPct/scale*100)+'%';
+  $('seam1').style.right=(cap/scale*100)+'%';
+  $('seam2').style.right=(totalCap/scale*100)+'%';
+  const card=$('samaCard'),badge=$('samaBadge');
+  card.classList.remove('warn','over');badge.className='badge';
+  let msg='';
+  const room=(cap/100*salary)-installment; // remaining installment room under primary cap
+  if(totalPct>totalCap+0.01){
+    card.classList.add('over');badge.classList.add('over');badge.textContent='تجاوز الحد';
+    const over=(totalPct-totalCap)/100*salary;
+    msg=`<b>السبب:</b> إجمالي التزاماتك ${totalPct.toFixed(1)}% يتجاوز سقف ساما ${totalCap}% (${ftype==='realestate'?'شامل العقاري':'غير العقاري'}). التجاوز ≈ <b>${fmt(over,0)}</b> ريال شهريًا. خفّض القسط أو المبلغ أو سدّد التزامًا قائمًا.`;
+  } else if(thisPct>cap+0.01){
+    card.classList.add('over');badge.classList.add('over');badge.textContent='تجاوز الحد';
+    const over=(thisPct-cap)/100*salary;
+    msg=`<b>السبب:</b> قسط هذا التمويل وحده ${thisPct.toFixed(1)}% يتجاوز حد ${ftype==='realestate'?'العقاري':'التمويل الشخصي'} ${cap}%. التجاوز ≈ <b>${fmt(over,0)}</b> ريال. أقصى قسط مسموح ≈ <b>${fmt(cap/100*salary,0)}</b> ريال.`;
+  } else if(totalPct>cap+0.01){
+    card.classList.add('warn');badge.classList.add('warn');badge.textContent='قريب من الحد';
+    msg=`القسط ضمن حد ${cap}%، لكن <b>إجمالي التزاماتك</b> ${totalPct.toFixed(1)}% اقترب من سقف ${totalCap}%. متبقٍ لك ≈ <b>${fmt((totalCap/100*salary)-(installment+otherObligations),0)}</b> ريال قبل السقف الكلي.`;
+  } else {
+    badge.classList.add('ok');badge.textContent='ضمن الحد';
+    msg=`ضمن حدود ساما. أقصى قسط مسموح لهذا التمويل ≈ <b>${fmt(cap/100*salary,0)}</b> ريال، ومتبقٍ لك ≈ <b>${fmt(room,0)}</b> ريال قبل بلوغ الحد.`;
+  }
+  $('samaMsg').innerHTML=msg;
+}
+
+function calc(){
+  if(mode==='pay') return calcPay();
+  const salary=parseFloat($('salary').value)||0;
+  const dbr=parseFloat($('dbr').value)||0;
+  const cc=parseFloat($('cc').value)||0;
+  const other=parseFloat($('other').value)||0;
+  const rate=parseFloat($('rate').value)||0;
+  const years=parseInt($('years').value)||1;
+  const amount=parseFloat($('amount').value)||0;
+  const months=years*12;const f=rate/100;
+  $('dbrPill').textContent=dbr.toFixed(2);$('ratePill').textContent=rate.toFixed(2);
+  $('yearsPill').textContent=years;$('monthsTxt').textContent=months;
+  let principal,profit,total,installment;
+  if(mode==='max'){
+    installment=Math.max(0,salary*(dbr/100));
+    total=installment*months;principal=total/(1+f*years);profit=total-principal;
+    $('heroLabel').textContent='مبلغ التمويل الأقصى';$('heroBig').textContent=fmt(principal);
+    $('m1Lbl').textContent='القسط الشهري';$('m1').textContent=fmt(installment);
+    $('m2Lbl').textContent='إجمالي السداد';$('m2').textContent=fmt(total);
+  } else {
+    principal=amount;profit=principal*f*years;total=principal+profit;installment=total/months;
+    $('heroLabel').textContent='القسط الشهري';$('heroBig').textContent=fmt(installment);
+    $('m1Lbl').textContent='مبلغ التمويل';$('m1').textContent=fmt(principal);
+    $('m2Lbl').textContent='إجمالي السداد';$('m2').textContent=fmt(total);
+  }
+  $('m3Lbl').textContent='تكلفة الأرباح';$('m3').textContent=fmt(profit);
+  const rMo=solveR(principal,installment,months),apr=rMo*12*100,mult=rate>0?apr/rate:0;
+  $('flatV').textContent=rate.toFixed(2);$('aprV').textContent=apr.toFixed(2);$('multV').textContent=(mult>0?mult.toFixed(1):'0')+'×';
+  const ms=Math.max(apr,rate,.1);$('flatBar').style.width=(rate/ms*100)+'%';$('aprBar').style.width=(apr/ms*100)+'%';
+  updateSama(installment, cc+other);
+  const usedDbr=salary>0?installment/salary*100:NaN;
+  const rows=[
+    ['صافي الراتب الشهري',fmt(salary)+' ﷼'],
+    [mode==='max'?'نسبة قسط التمويل':'نسبة القسط من الراتب', isFinite(usedDbr)?usedDbr.toFixed(2)+'%':'—'],
+    ['التزامات أخرى شهرية',fmt(cc+other)+' ﷼'],
+    ['القسط الشهري',fmt(installment)+' ﷼'],
+    ['مدة التمويل',months+' شهر · '+years+' سنوات'],
+    ['هامش الربح (Flat)',rate.toFixed(2)+'%'],
+    ['المعدل الفعلي (APR)',apr.toFixed(2)+'%'],
+    ['مبلغ التمويل',fmt(principal)+' ﷼'],
+    ['إجمالي الأرباح',fmt(profit)+' ﷼'],
+  ];
+  let h=rowsHTML(rows);
+  h+=`<tr class="total"><td>إجمالي السداد <span class="tag">القسط × المدة</span></td><td>${cellVal(fmt(total)+' ﷼')}</td></tr>`;
+  $('breakdown').innerHTML=h;
+}
+
+function calcPay(){
+  const P=parseFloat($('p_principal').value)||0;
+  const A=parseFloat($('p_inst').value)||0;
+  const N=parseInt($('p_total').value)||1;
+  const paid=Math.min(parseInt($('p_paid').value)||0,N);
+  const yld=parseFloat($('p_yield').value)||0;
+  $('yieldPill').textContent=yld.toFixed(1);
+  const r=solveR(P,A,N), apr=r*12*100;
+  const totalRepay=A*N, totalProfit=totalRepay-P, flat=P>0?totalProfit/P/(N/12)*100:0;
+  let bal=P;for(let i=1;i<=paid;i++){const intr=bal*r;bal-=(A-intr);}
+  const outstanding=Math.max(0,bal);
+  const remainingTotal=A*(N-paid);
+  const unearned=remainingTotal-outstanding;
+  let b2=outstanding,fee=0;const feeMonths=Math.min(3,N-paid);for(let i=0;i<feeMonths;i++){const intr=b2*r;fee+=intr;b2-=(A-intr);}
+  const settle=outstanding+fee;
+  const saving=remainingTotal-settle;
+  // breakeven vs investing the settlement cash at yld for remaining months
+  const remMonths=N-paid, mYld=yld/100/12;
+  // if you DON'T settle: you keep `settle` cash invested, but pay `remainingTotal` over remMonths.
+  // Compare future value of cash invested minus installments paid, vs zero (settling).
+  // Simplified: invest `settle` lump; FV; subtract FV of paying installments. Positive => keep loan.
+  let fvCash=settle*Math.pow(1+mYld,remMonths);
+  let fvInst=0;for(let i=0;i<remMonths;i++){fvInst=(fvInst+A)*(1+mYld);}
+  const keepAdvantage=fvCash-fvInst; // >0 means keeping loan & investing wins
+  $('heroLabel').textContent='مبلغ الإقفال التقديري';$('heroBig').textContent=fmt(settle);
+  $('m1Lbl').textContent='الرصيد الأصلي المتبقي';$('m1').textContent=fmt(outstanding);
+  $('m2Lbl').textContent='التوفير مقابل المعروض';$('m2').textContent=fmt(saving);
+  $('m3Lbl').textContent='أرباح غير مستحقة';$('m3').textContent=fmt(unearned);
+  const rows=[
+    ['مبلغ التمويل الأصلي',fmt(P)+' ﷼'],
+    ['هامش الربح (Flat)',flat.toFixed(2)+'%'],
+    ['المعدل الفعلي (APR)',apr.toFixed(2)+'%'],
+    ['الأقساط المدفوعة',paid+' من '+N],
+    ['الرصيد الأصلي المتبقي',fmt(outstanding)+' ﷼'],
+    ['المتبقي المعروض (أقساط × عدد)',fmt(remainingTotal)+' ﷼'],
+    ['الأرباح غير المستحقة',fmt(unearned)+' ﷼'],
+    ['رسوم السداد المبكر (أرباح '+feeMonths+' أشهر · حد ساما)',fmt(fee)+' ﷼'],
+    ['مبلغ الإقفال التقديري',fmt(settle)+' ﷼'],
+  ];
+  let h=rowsHTML(rows);
+  h+=`<tr class="total save"><td>التوفير من الإقفال المبكر <span class="tag">المتبقي − مبلغ الإقفال</span></td><td>${cellVal(fmt(saving)+' ﷼')}</td></tr>`;
+  const verdict = keepAdvantage>0
+    ? `بعائد <b>${yld.toFixed(1)}%</b>: <b style="color:var(--teal)">إبقاء القرض واستثمار السيولة أفضل</b> بفارق ≈ <b>${fmt(keepAdvantage,0)}</b> ريال على المدة المتبقية.`
+    : `بعائد <b>${yld.toFixed(1)}%</b>: <b style="color:var(--amber)">الإقفال المبكر أفضل</b> — توفّر ≈ <b>${fmt(-keepAdvantage,0)}</b> ريال مقارنةً بإبقائه واستثمار السيولة.`;
+  h+=`<tr class="verdict"><td colspan="2">القرار: ${verdict}</td></tr>`;
+  $('breakdown').innerHTML=h;
+}
+
+function resetAll(){
+  ['salary','cc','other','amount','p_principal','p_inst','p_total','p_paid'].forEach(id=>$(id).value='');
+  $('dbr').value=33.33;$('rate').value=2;$('years').value=5;$('p_yield').value=8;
+  setEmp('emp');setFtype('personal');calc();
+}
+['salary','cc','other','amount'].forEach(id=>$(id).addEventListener('input',calc));
+calc();
+</script>
+</body>
+</html>
