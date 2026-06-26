@@ -142,32 +142,32 @@ body{font-family:"Tajawal",system-ui,sans-serif;background:var(--paper);color:va
 .head .sig-head{font-family:'Aref Ruqaa',serif;font-weight:400;color:#C9A24B;font-size:13.5px;margin-top:10px;opacity:.92}
 @media(max-width:480px){.card{padding:16px}.hero .meta{gap:10px}.cmpgrid{gap:8px}.cmpcol{padding:11px}}
 @media print{
-  @page{size:A4 portrait;margin:14mm 13mm}
-  html,body{background:#fff;padding:0;margin:0;font-size:11.5px;line-height:1.55}
+  @page{size:A4 portrait;margin:10mm}
+  html,body{background:#fff;padding:0;margin:0;font-size:10px;line-height:1.45}
   .seg,.actions,.foot,.savednote{display:none!important}
   #cfgCard{display:none!important}
-  .head{background:#11212B!important;padding:20px 22px!important;border-radius:10px;margin-bottom:16px}
+  .head{background:#11212B!important;padding:15px 18px!important;border-radius:9px;margin-bottom:11px}
   .head::after{display:none}
-  .head h1{font-size:22px;margin-bottom:4px}.head .eyebrow{font-size:9px;letter-spacing:2px;margin-bottom:5px}.head p{font-size:11px;max-width:100%}
-  /* single comfortable column, generous spacing that spreads down the page */
+  .head h1{font-size:19px;margin-bottom:3px}.head .eyebrow{font-size:8.5px;letter-spacing:2px;margin-bottom:4px}.head p{font-size:10px;max-width:100%}
+  /* single readable column, spacing tuned to fill exactly one page */
   main.stage{margin-top:0!important;column-count:1;max-width:100%}
   .wrap{padding:0;max-width:100%}
-  .card{box-shadow:none!important;border:1px solid #DCD9CF!important;border-radius:12px;
-    padding:18px 20px!important;margin:0 0 16px!important;break-inside:avoid;page-break-inside:avoid;
+  .card{box-shadow:none!important;border:1px solid #DCD9CF!important;border-radius:10px;
+    padding:13px 15px!important;margin:0 0 11px!important;break-inside:avoid;page-break-inside:avoid;
     animation:none;display:block;width:100%}
-  .card h2{font-size:15px;margin-bottom:3px}.card .sub{font-size:10.5px;margin-bottom:12px}
-  .hero{padding:22px 20px!important}
-  .hero .big{font-size:38px}
-  .hero .meta{gap:18px;margin-top:16px;padding-top:16px}.hero .meta b{font-size:15px}.hero .meta span{font-size:10px}
-  .chartsvg{height:150px}
-  .chartlegend{font-size:10.5px;margin-top:12px;gap:18px}
-  .gauge{margin:14px 0 7px;height:15px}.glabels{font-size:10px}
-  .samamsg{padding:13px;font-size:11px;margin-top:12px}
-  .bar{margin-bottom:13px}.bar .top .n{font-size:12px}.bar .top .v{font-size:13px}.track{height:13px}
-  .mult{padding:9px 14px;font-size:13px;margin-top:5px}.note{font-size:10.5px;margin-top:10px;line-height:1.7}
-  .tbl{font-size:12.5px}.tbl td{padding:9px 0}.tbl tr.total td:last-child .v{font-size:15px}
-  .cmpgrid{grid-template-columns:1fr 1fr;gap:14px}.cmpcol{padding:15px}.cmprow{font-size:12px;padding:7px 0}
-  .sig{margin-top:26px;padding-top:18px;font-size:18px}
+  .card h2{font-size:13px;margin-bottom:2px}.card .sub{font-size:9.5px;margin-bottom:9px}
+  .hero{padding:16px 15px!important}
+  .hero .big{font-size:30px}
+  .hero .meta{gap:12px;margin-top:11px;padding-top:11px}.hero .meta b{font-size:13px}.hero .meta span{font-size:9px}
+  .chartsvg{height:108px}
+  .chartlegend{font-size:9.5px;margin-top:9px;gap:14px}
+  .gauge{margin:10px 0 6px;height:13px}.glabels{font-size:9px}
+  .samamsg{padding:10px;font-size:10px;margin-top:9px}
+  .bar{margin-bottom:9px}.bar .top .n{font-size:10.5px}.bar .top .v{font-size:11.5px}.track{height:11px}
+  .mult{padding:7px 11px;font-size:11px;margin-top:4px}.note{font-size:9.5px;margin-top:7px;line-height:1.6}
+  .tbl{font-size:10.5px}.tbl td{padding:6px 0}.tbl tr.total td:last-child .v{font-size:13px}
+  .cmpgrid{grid-template-columns:1fr 1fr;gap:11px}.cmpcol{padding:12px}.cmprow{font-size:10px;padding:5px 0}
+  .sig{margin-top:16px;padding-top:13px;font-size:16px}
   *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }
 </style>
@@ -283,6 +283,8 @@ body{font-family:"Tajawal",system-ui,sans-serif;background:var(--paper);color:va
         <div class="input"><input id="b_total" placeholder="مثال: 60" type="number" inputmode="numeric"><span class="unit">قسط</span></div></div>
       <div class="field"><label>الأقساط المدفوعة حتى الآن</label>
         <div class="input"><input id="b_paid" placeholder="مثال: 12" type="number" inputmode="numeric"><span class="unit">قسط</span></div></div>
+      <div class="field"><label>راتبك الصافي الحالي <span class="hint">(لحد ساما وأفضل مدة)</span></label>
+        <div class="input"><input id="b_salary" placeholder="مثال: 12000" type="number" inputmode="decimal"><span class="unit">ريال</span></div></div>
       <div style="font-family:'Tajawal';font-weight:600;color:var(--ink);margin:16px 0 10px;padding-top:14px;border-top:1px solid var(--line)">العرض الجديد (البنك الآخر)</div>
       <div class="field"><label>هامش الربح Flat للعرض الجديد</label>
         <div class="rangewrap"><input id="b_newrate" type="range" min="0.5" max="8" step="0.01" value="1.40"><span class="pillbox"><input class="pillinput" type="number" data-range="b_newrate" min="0.5" max="8" step="0.01" value="1.40" inputmode="decimal"><span class="pu">%</span></span></div></div>
@@ -387,7 +389,7 @@ const fmt=(n,d=2)=>isFinite(n)?Number(n).toLocaleString('en-US',{minimumFraction
 
 /* ---------- persistence ---------- */
 const STORE='ftcalc_v2';
-const FIELDS=['salary','dbr','cc','other','amount','rate','years','p_principal','p_inst','p_total','p_paid','p_yield','c_amount','cA_rate','cA_years','cB_rate','cB_years','b_principal','b_inst','b_total','b_paid','b_newrate','b_newyears','b_fees','s_oldsal','s_newsal','s_principal','s_inst','s_total','s_paid','s_newrate'];
+const FIELDS=['salary','dbr','cc','other','amount','rate','years','p_principal','p_inst','p_total','p_paid','p_yield','c_amount','cA_rate','cA_years','cB_rate','cB_years','b_principal','b_inst','b_total','b_paid','b_newrate','b_newyears','b_fees','b_salary','s_oldsal','s_newsal','s_principal','s_inst','s_total','s_paid','s_newrate'];
 let saveTimer=null;
 function save(){
   try{
@@ -630,7 +632,7 @@ function calcBuy(){
   const P=parseFloat($('b_principal').value)||0,A=parseFloat($('b_inst').value)||0,N=parseInt($('b_total').value)||1;
   const paid=Math.min(parseInt($('b_paid').value)||0,N);
   const newRate=parseFloat($('b_newrate').value)||0,newYears=parseInt($('b_newyears').value)||1,fees=parseFloat($('b_fees').value)||0;
-  
+  const newSalary=parseFloat($('b_salary').value)||0;
   if(P<=0||A<=0){heroPrompt('أدخل بيانات قرضك الحالي لتعرف الجدوى');$('breakdown').innerHTML='';drawChart(0,0,0,0,null);return;}
   const r=solveR(P,A,N),curAPR=r*12*100;
   let bal=P;for(let i=1;i<=paid;i++){bal-=(A-bal*r);}
@@ -646,6 +648,16 @@ function calcBuy(){
   const newAPR=solveR(newPrincipal,newInst,newN)*12*100;
   const saving=stayTotal-newTotal;        // >0 => buyout cheaper overall
   const instDrop=A-newInst;
+  // salary-aware: SAMA cap + optimal (shortest) term that fits, maximizing total saving
+  const cap = newSalary>0 ? newSalary*0.3333 : Infinity;
+  const overCap = newSalary>0 && newInst > cap+1;
+  let opt=null;
+  if(newSalary>0){
+    for(let mo=6; mo<=remN; mo++){
+      const y=mo/12, tot=settle*(1+f*y), inst=tot/mo;
+      if(inst<=cap+1){ opt={mo,inst,tot,sv:stayTotal-tot,apr:solveR(settle,inst,mo)*12*100,pct:inst/newSalary*100}; break; }
+    }
+  }
   // hero
   $('heroLabel').textContent=saving>=0?'توفيرك من شراء المديونية':'خسارتك من شراء المديونية';
   animateNum($('heroBig'),Math.abs(saving));
@@ -665,6 +677,8 @@ function calcBuy(){
     ['APR الحالي مقابل الجديد',curAPR.toFixed(2)+'% ← '+newAPR.toFixed(2)+'%'],
     ['القسط الحالي مقابل الجديد',fmt(A,0)+' ← '+fmt(newInst,0)],
     ['المدة المتبقية مقابل الجديدة',remN+' ← '+newN+' شهر'],
+    ...(newSalary>0?[['حد ساما على راتبك الجديد (33.33%)',fmt(cap,0)+' ﷼'],
+        ['قسطك الجديد مقابل الحد',fmt(newInst,0)+' / '+fmt(cap,0)+(overCap?' ⚠️':' ✓')]]:[]),
     ['تبقى: إجمالي ما ستدفعه (لو بقيت)',fmt(stayTotal)+' ﷼'],
     ['تطلع: إجمالي ما ستدفعه (لو طلعت)',fmt(newTotal)+' ﷼'],
   ];
@@ -684,6 +698,19 @@ function calcBuy(){
     v=`العرضان متقاربان جدًا في التكلفة الإجمالية (فرق ≈ ${fmt(Math.abs(saving),0)} ريال). الفرق لا يستحق عناء التحويل غالبًا.`;
   }
   v+=` <span style="color:var(--muted)">القاعدة: قارن «إجمالي ما ستدفعه» لا القسط الشهري وحده.</span>`;
+  // salary-aware optimal recommendation
+  if(newSalary>0){
+    if(overCap) v=`<b style="color:var(--red)">⚠️ قسط العرض الحالي (${fmt(newInst,0)}) يتجاوز حد ساما على راتبك (${fmt(cap,0)}).</b> `+v;
+    if(opt){
+      if(opt.sv>500 && opt.mo<newN){
+        v+=`<br><br><b style="color:var(--teal)">💡 الأمثل لراتبك الجديد:</b> قصّر مدة العرض إلى <b>${opt.mo} شهر</b> — قسط ${fmt(opt.inst,0)} ريال (${opt.pct.toFixed(0)}% من راتبك، ضمن الحد)، APR ${opt.apr.toFixed(2)}%. عندها يصبح شراء المديونية <b style="color:var(--teal)">مربحًا: توفّر ≈ ${fmt(opt.sv,0)} ريال</b>. استغل راتبك العالي لمدة أقصر بدل تمديدها.`;
+      } else if(opt.sv>500){
+        v+=`<br><br><b style="color:var(--teal)">💡</b> راتبك يتحمّل قسطًا أعلى — أقصر مدة ممكنة (${opt.mo} شهر) توفّر ≈ ${fmt(opt.sv,0)} ريال.`;
+      }
+    }
+  } else {
+    v+=` <span style="color:var(--muted)">أضف راتبك الحالي لعرض حد ساما وأفضل مدة لك.</span>`;
+  }
   h+=`<tr class="verdict"><td colspan="2">${v}</td></tr>`;
   $('breakdown').innerHTML=h;
 }
