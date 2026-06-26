@@ -347,8 +347,9 @@ body{font-family:"Tajawal",system-ui,sans-serif;background:var(--paper);color:va
     <div class="sub" id="chartSub">كيف يتناقص أصل دينك مع كل قسط.</div>
     <div class="chartwrap"><svg id="chartSvg" class="chartsvg" viewBox="0 0 320 160" preserveAspectRatio="none"></svg><div id="chartEmpty" class="chart-empty hidden">أدخل بيانات التمويل لعرض المنحنى.</div></div>
     <div class="chartlegend">
-      <span><i style="background:var(--teal)"></i> الرصيد المتبقي</span>
-      <span id="legPaid" class="hidden"><i style="background:var(--brass)"></i> ما تم سداده</span>
+      <span><i style="background:rgba(11,110,85,.55)"></i> أصل القسط (يُنقص دينك)</span>
+      <span><i style="background:rgba(181,83,14,.6)"></i> أرباح القسط (تكلفة البنك)</span>
+      <span id="legPaid" class="hidden"><i style="background:var(--brass)"></i> موقعك الحالي</span>
     </div>
   </section>
 
@@ -460,7 +461,7 @@ function setMode(m){
   $('grpSal').classList.toggle('hidden',m!=='sal');
   $('f_dbr').classList.toggle('hidden',m!=='max');
   $('f_amount').classList.toggle('hidden',m!=='inst');
-  $('cfgSub').textContent = m==='cmp'?'أدخل المبلغ ثم عرضين بهامش/مدة مختلفين.':(m==='buy'?'أدخل قرضك الحالي والعرض الجديد لتعرف كم توفّر أو تخسر فعليًا.':(m==='sal'?'راتبك ارتفع منذ الاقتراض؟ شوف كيف يغيّر قدرتك وخياراتك.':'عدّل القيم وتتحدث النتائج فورًا — بياناتك تُحفظ تلقائيًا على جهازك.'));
+  $('cfgSub').textContent = m==='cmp'?'أدخل المبلغ ثم عرضين بهامش/مدة مختلفين.':(m==='buy'?'أدخل قرضك الحالي والعرض الجديد — بياناتك مشتركة مع باقي التبويبات.':(m==='sal'?'راتبك ارتفع منذ الاقتراض؟ شوف كيف يغيّر قدرتك — بياناتك مشتركة مع باقي التبويبات.':(m==='pay'?'أدخل قرضك الحالي — بياناتك مشتركة مع باقي التبويبات.':'عدّل القيم وتتحدث النتائج فورًا — بياناتك تُحفظ تلقائيًا على جهازك.')));
   calc();save();
 }
 function setEmp(e,silent){emp=e;$('empE').classList.toggle('on',e==='emp');$('empR').classList.toggle('on',e==='ret');if(!silent){calc();save();}}
@@ -480,27 +481,34 @@ function rowsHTML(rows){return rows.map(r=>`<tr><td>${r[0]}</td><td>${cellVal(r[
 
 /* ---------- chart ---------- */
 function drawChart(P,r,A,N,paid){
-  const W=320,H=160,pad=4;
-  if(P<=0||N<=0||!isFinite(P)){$('chartSvg').classList.add('hidden');$('chartEmpty').classList.remove('hidden');$('chartSvg').innerHTML='';return;}
+  const W=320,H=160,pad=6;
+  if(P<=0||N<=0||A<=0||!isFinite(P)){$('chartSvg').classList.add('hidden');$('chartEmpty').classList.remove('hidden');$('chartSvg').innerHTML='';return;}
   $('chartSvg').classList.remove('hidden');$('chartEmpty').classList.add('hidden');
-  let bal=P,pts=[[0,P]];
-  for(let i=1;i<=N;i++){const intr=bal*r;bal=Math.max(0,bal-(A-intr));pts.push([i,bal]);}
-  const xs=i=>pad+(i/N)*(W-2*pad), ys=v=>pad+(1-v/P)*(H-2*pad);
-  let line='',area='M '+xs(0)+' '+ys(P);
-  pts.forEach(([i,v])=>{const x=xs(i),y=ys(v);line+=(i===0?'M':'L')+x+' '+y+' ';area+=' L '+x+' '+y;});
-  area+=' L '+xs(N)+' '+(H-pad)+' L '+xs(0)+' '+(H-pad)+' Z';
-  // gridlines per year
+  const yB=H-pad,yT=pad,plotH=yB-yT,plotW=W-2*pad;
+  let bal=P;const pts=[];
+  for(let i=1;i<=N;i++){const intr=bal*r;const prin=A-intr;bal-=prin;pts.push({i,pf:Math.max(0,Math.min(1,prin/A))});}
+  const x=i=>pad+((i-1)/((N-1)||1))*plotW;
+  const yb=f=>yB-f*plotH; // boundary: principal below, profit above
+  // principal area (teal, bottom)
+  let pPrin='M '+x(1).toFixed(1)+' '+yB.toFixed(1);
+  pts.forEach(p=>pPrin+=' L '+x(p.i).toFixed(1)+' '+yb(p.pf).toFixed(1));
+  pPrin+=' L '+x(N).toFixed(1)+' '+yB.toFixed(1)+' Z';
+  // profit area (amber, top wedge)
+  let pProf='M '+x(1).toFixed(1)+' '+yT.toFixed(1)+' L '+x(N).toFixed(1)+' '+yT.toFixed(1);
+  for(let k=pts.length-1;k>=0;k--)pProf+=' L '+x(pts[k].i).toFixed(1)+' '+yb(pts[k].pf).toFixed(1);
+  pProf+=' Z';
+  // boundary line
+  let line='';pts.forEach((p,idx)=>line+=(idx===0?'M':'L')+x(p.i).toFixed(1)+' '+yb(p.pf).toFixed(1)+' ');
+  // year gridlines
   let grid='';const yrs=Math.round(N/12);
-  for(let g=1;g<yrs;g++){const x=xs(g*12);grid+=`<line x1="${x}" y1="${pad}" x2="${x}" y2="${H-pad}" stroke="#EEEAE0" stroke-width="1"/>`;}
+  for(let g=1;g<yrs;g++){const gx=x(g*12);grid+=`<line x1="${gx.toFixed(1)}" y1="${yT}" x2="${gx.toFixed(1)}" y2="${yB}" stroke="#EEEAE0" stroke-width="1"/>`;}
   let marker='';
-  if(paid!=null && paid>0 && paid<N){
-    const x=xs(paid),y=ys(pts[paid][1]);
-    marker=`<line x1="${x}" y1="${pad}" x2="${x}" y2="${H-pad}" stroke="#9A7B2E" stroke-width="1.5" stroke-dasharray="3 3"/><circle cx="${x}" cy="${y}" r="4" fill="#9A7B2E"/>`;
-  }
+  if(paid!=null&&paid>0&&paid<N){const mx=x(paid);marker=`<line x1="${mx.toFixed(1)}" y1="${yT}" x2="${mx.toFixed(1)}" y2="${yB}" stroke="#9A7B2E" stroke-width="1.6" stroke-dasharray="3 3"/>`;}
   $('chartSvg').innerHTML=
     grid+
-    `<path d="${area}" fill="rgba(11,110,85,.10)"/>`+
-    `<path d="${line}" fill="none" stroke="#0B6E55" stroke-width="2.4" stroke-linejoin="round"/>`+
+    `<path d="${pPrin}" fill="rgba(11,110,85,.20)"/>`+
+    `<path d="${pProf}" fill="rgba(181,83,14,.32)"/>`+
+    `<path d="${line}" fill="none" stroke="#0B6E55" stroke-width="2" stroke-linejoin="round"/>`+
     marker;
 }
 
@@ -534,7 +542,7 @@ function calc(){
   $('flatV').textContent=rate.toFixed(2);$('aprV').textContent=apr.toFixed(2);$('multV').textContent=(mult>0?mult.toFixed(1):'0')+'×';
   const ms=Math.max(apr,rate,.1);$('flatBar').style.width=(rate/ms*100)+'%';$('aprBar').style.width=(apr/ms*100)+'%';
   updateSama(installment,cc+other);
-  $('chartTitle').textContent='انخفاض الرصيد عبر المدة';$('chartSub').textContent='كيف يتناقص أصل دينك مع كل قسط.';$('legPaid').classList.add('hidden');
+  $('chartTitle').textContent='توزيع القسط: أصل مقابل أرباح';$('chartSub').textContent='أرباح القسط تتركّز في البداية ثم تتلاشى — لذلك السداد المبكر يوفّر.';$('legPaid').classList.add('hidden');
   drawChart(principal,rMo,installment,months,null);
   const usedDbr=salary>0?installment/salary*100:NaN;
   const rows=[
@@ -569,7 +577,7 @@ function calcPay(){
   $('m1Lbl').textContent='الرصيد الأصلي المتبقي';animateNum($('m1'),outstanding);
   $('m2Lbl').textContent='التوفير مقابل المعروض';animateNum($('m2'),saving);
   $('m3Lbl').textContent='أرباح غير مستحقة';animateNum($('m3'),unearned);
-  $('chartTitle').textContent='موقعك على منحنى السداد';$('chartSub').textContent='الخط المنقّط = أين أنت الآن من سداد دينك.';$('legPaid').classList.remove('hidden');
+  $('chartTitle').textContent='توزيع قسطك وموقعك الحالي';$('chartSub').textContent='الخط المنقّط = أين أنت. لاحظ كيف تقلّ الأرباح بعده — معظمها دفعته بالفعل.';$('legPaid').classList.remove('hidden');
   drawChart(P,r,A,N,paid);
   const rows=[
     ['مبلغ التمويل الأصلي',fmt(P)+' ﷼'],
@@ -665,7 +673,7 @@ function calcBuy(){
   $('m2Lbl').textContent='الفرق في القسط';animateNum($('m2'),Math.abs(instDrop));
   $('m3Lbl').textContent='المبلغ المموَّل الجديد';animateNum($('m3'),newPrincipal);
   // chart: new loan balance
-  $('chartTitle').textContent='منحنى القرض الجديد';$('chartSub').textContent='كيف يتناقص رصيد العرض الجديد عبر مدته.';$('legPaid').classList.add('hidden');
+  $('chartTitle').textContent='توزيع قسط العرض الجديد: أصل مقابل أرباح';$('chartSub').textContent='كيف ينقسم كل قسط في العرض الجديد عبر مدته.';$('legPaid').classList.add('hidden');
   drawChart(newPrincipal,solveR(newPrincipal,newInst,newN),newInst,newN,null);
   const rows=[
     ['الرصيد الأصلي المتبقي (قرضك الحالي)',fmt(outstanding)+' ﷼'],
@@ -791,15 +799,28 @@ function updateSama(installment,otherObl){
 /* ---------- wire up ---------- */
 function onInput(){calc();save();}
 function syncBoxes(){document.querySelectorAll('.pillinput[data-range]').forEach(b=>{const r=$(b.dataset.range);if(r)b.value=r.value;});}
+/* ---- cross-tab linking: enter your loan once, reflects everywhere ---- */
+const LINKS=[
+  ['p_principal','b_principal','s_principal'],  // مبلغ التمويل الأصلي
+  ['p_inst','b_inst','s_inst'],                 // القسط الشهري
+  ['p_total','b_total','s_total'],              // إجمالي الأقساط
+  ['p_paid','b_paid','s_paid'],                 // الأقساط المدفوعة
+  ['salary','b_salary','s_newsal']              // الراتب الحالي
+];
+const LINKMAP={};LINKS.forEach(g=>g.forEach(id=>LINKMAP[id]=g));
+function propagate(id){const g=LINKMAP[id];if(!g)return;const v=$(id)?$(id).value:'';g.forEach(o=>{if(o!==id&&$(o)&&$(o).value!==v)$(o).value=v;});}
+function linkInit(){LINKS.forEach(g=>{let src='';for(const id of g){const el=$(id);if(el&&el.value!==''){src=el.value;break;}}if(src!=='')g.forEach(id=>{const el=$(id);if(el)el.value=src;});});}
 document.addEventListener('input',e=>{
   const t=e.target;
   if(t.matches('input[type=range]')){const b=document.querySelector('.pillinput[data-range="'+t.id+'"]');if(b)b.value=t.value;}
   else if(t.matches('.pillinput[data-range]')){const r=$(t.dataset.range);if(r&&t.value!=='')r.value=t.value;}
+  if(t.id&&LINKMAP[t.id])propagate(t.id);
   if(t.matches('input'))onInput();
 });
 document.addEventListener('change',e=>{const t=e.target;if(t.matches('.pillinput[data-range]')){const r=$(t.dataset.range);if(r)t.value=r.value;}});
 load();
 syncBoxes();
+linkInit();
 setMode(mode);
 </script>
 </body>
