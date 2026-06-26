@@ -413,10 +413,9 @@ function load(){
 }
 function clearAll(){
   try{localStorage.removeItem(STORE);}catch(e){}
-  ['salary','cc','other','amount','p_principal','p_inst','p_total','p_paid','c_amount'].forEach(id=>$(id).value='');
-  $('dbr').value=33.33;$('rate').value=2;$('years').value=5;$('p_yield').value=8;
-  $('cA_rate').value=1.77;$('cA_years').value=5;$('cB_rate').value=2.20;$('cB_years').value=5;
-  setEmp('emp',true);setFtype('personal',true);syncBoxes();calc();
+  const DEFAULTS={dbr:'33.33',rate:'2',years:'5',p_yield:'8',cA_rate:'1.77',cA_years:'5',cB_rate:'2.20',cB_years:'5',b_newrate:'1.40',b_newyears:'5',s_newrate:'1.40'};
+  FIELDS.forEach(f=>{const el=$(f);if(!el)return;el.value=(f in DEFAULTS)?DEFAULTS[f]:'';});
+  setEmp('emp',true);setFtype('personal',true);syncBoxes();linkInit();calc();save();
 }
 
 /* ---------- count-up animation ---------- */
