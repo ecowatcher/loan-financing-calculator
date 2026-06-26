@@ -110,6 +110,7 @@ body{font-family:"Tajawal",system-ui,sans-serif;background:var(--paper);color:va
 .tbl tr.total td{font-weight:700;color:var(--ink)}.tbl tr.total td:last-child .v{color:var(--teal);font-size:16px}
 .tbl .tag{font-size:11px;color:var(--muted);font-weight:400;display:block}
 .tbl tr.save td:last-child .v{color:var(--green)}
+.tbl tr.loss td:last-child .v{color:var(--red)}
 .tbl tr.verdict td{padding-top:14px;font-weight:600;line-height:1.7;color:var(--ink);text-align:right;width:auto!important}
 .tbl tr.verdict td[colspan]{width:auto}
 @media(max-width:420px){.tbl{font-size:13.5px}.tbl td:last-child{width:46%}}
@@ -141,34 +142,32 @@ body{font-family:"Tajawal",system-ui,sans-serif;background:var(--paper);color:va
 .head .sig-head{font-family:'Aref Ruqaa',serif;font-weight:400;color:#C9A24B;font-size:13.5px;margin-top:10px;opacity:.92}
 @media(max-width:480px){.card{padding:16px}.hero .meta{gap:10px}.cmpgrid{gap:8px}.cmpcol{padding:11px}}
 @media print{
-  @page{size:A4 portrait;margin:7mm}
-  html,body{background:#fff;padding:0;margin:0;font-size:9.5px;line-height:1.35}
+  @page{size:A4 portrait;margin:14mm 13mm}
+  html,body{background:#fff;padding:0;margin:0;font-size:11.5px;line-height:1.55}
   .seg,.actions,.foot,.savednote{display:none!important}
   #cfgCard{display:none!important}
-  .head{background:#11212B!important;padding:11px 14px!important;border-radius:0;margin-bottom:6px}
+  .head{background:#11212B!important;padding:20px 22px!important;border-radius:10px;margin-bottom:16px}
   .head::after{display:none}
-  .head h1{font-size:17px;margin-bottom:2px}.head .eyebrow{font-size:8px;margin-bottom:2px}.head p{font-size:9px}
-  /* two-column magazine flow that fills the page height evenly */
-  main.stage{margin-top:8px!important;column-count:2;column-gap:7mm;max-width:100%}
+  .head h1{font-size:22px;margin-bottom:4px}.head .eyebrow{font-size:9px;letter-spacing:2px;margin-bottom:5px}.head p{font-size:11px;max-width:100%}
+  /* single comfortable column, generous spacing that spreads down the page */
+  main.stage{margin-top:0!important;column-count:1;max-width:100%}
   .wrap{padding:0;max-width:100%}
-  .card{box-shadow:none!important;border:1px solid #D8D5CB!important;border-radius:8px;
-    padding:11px 13px!important;margin:0 0 9px!important;break-inside:avoid;page-break-inside:avoid;
+  .card{box-shadow:none!important;border:1px solid #DCD9CF!important;border-radius:12px;
+    padding:18px 20px!important;margin:0 0 16px!important;break-inside:avoid;page-break-inside:avoid;
     animation:none;display:block;width:100%}
-  .card h2{font-size:12px;margin-bottom:2px}.card .sub{font-size:9px;margin-bottom:7px}
-  .hero{padding:14px 13px!important}
-  .hero .big{font-size:26px}
-  .hero .meta{gap:8px;margin-top:9px;padding-top:9px}.hero .meta b{font-size:12px}.hero .meta span{font-size:8.5px}
-  .chartsvg{height:96px}
-  .chartlegend{font-size:9px;margin-top:7px;gap:12px}
-  .gauge{margin:8px 0 5px;height:12px}.glabels{font-size:8.5px}
-  .samamsg{padding:9px;font-size:9.5px;margin-top:8px}
-  .bar{margin-bottom:8px}.bar .top .n{font-size:10px}.bar .top .v{font-size:11px}.track{height:10px}
-  .mult{padding:6px 10px;font-size:10.5px;margin-top:3px}.note{font-size:9px;margin-top:6px}
-  .tbl{font-size:10px}.tbl td{padding:5px 0}.tbl tr.total td:last-child .v{font-size:12px}
-  .cmpcol{padding:11px}.cmprow{font-size:9.5px;padding:5px 0}
-  /* wide cards span both columns so they aren't cramped */
-  #cmpCard{column-span:all;break-inside:auto}
-  .sig{column-span:all;margin-top:14px;padding-top:12px;font-size:15px}
+  .card h2{font-size:15px;margin-bottom:3px}.card .sub{font-size:10.5px;margin-bottom:12px}
+  .hero{padding:22px 20px!important}
+  .hero .big{font-size:38px}
+  .hero .meta{gap:18px;margin-top:16px;padding-top:16px}.hero .meta b{font-size:15px}.hero .meta span{font-size:10px}
+  .chartsvg{height:150px}
+  .chartlegend{font-size:10.5px;margin-top:12px;gap:18px}
+  .gauge{margin:14px 0 7px;height:15px}.glabels{font-size:10px}
+  .samamsg{padding:13px;font-size:11px;margin-top:12px}
+  .bar{margin-bottom:13px}.bar .top .n{font-size:12px}.bar .top .v{font-size:13px}.track{height:13px}
+  .mult{padding:9px 14px;font-size:13px;margin-top:5px}.note{font-size:10.5px;margin-top:10px;line-height:1.7}
+  .tbl{font-size:12.5px}.tbl td{padding:9px 0}.tbl tr.total td:last-child .v{font-size:15px}
+  .cmpgrid{grid-template-columns:1fr 1fr;gap:14px}.cmpcol{padding:15px}.cmprow{font-size:12px;padding:7px 0}
+  .sig{margin-top:26px;padding-top:18px;font-size:18px}
   *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }
 </style>
@@ -670,7 +669,7 @@ function calcBuy(){
     ['تطلع: إجمالي ما ستدفعه (لو طلعت)',fmt(newTotal)+' ﷼'],
   ];
   let h=rowsHTML(rows);
-  const cls=saving>=0?'total save':'total';
+  const cls=saving>=0?'total save':'total loss';
   h+=`<tr class="${cls}"><td>${saving>=0?'صافي التوفير':'صافي الخسارة'} <span class="tag">تبقى − تطلع</span></td><td>${cellVal(fmt(Math.abs(saving))+' ﷼')}</td></tr>`;
   // verdict
   let v;
