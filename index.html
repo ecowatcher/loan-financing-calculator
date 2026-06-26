@@ -48,6 +48,9 @@ body{font-family:"Tajawal",system-ui,sans-serif;background:var(--paper);color:va
 .input .unit{padding:0 14px;color:var(--muted);font-size:13px;font-weight:500;border-inline-start:1px solid var(--line);align-self:stretch;display:flex;align-items:center;background:#F4F2EC}
 .rangewrap{display:flex;align-items:center;gap:12px;margin-top:8px}
 .rangewrap input[type=range]{flex:1;accent-color:var(--teal);height:4px}
+.chk{display:flex;gap:9px;align-items:flex-start;margin-top:14px;padding:11px 13px;background:var(--teal-soft);border:1px solid rgba(11,110,85,.25);border-radius:12px;cursor:pointer;font-size:13.5px;color:var(--ink);line-height:1.5}
+.chk input{width:18px;height:18px;accent-color:var(--teal);margin-top:1px;flex:none;cursor:pointer}
+.chk .hint{display:block;color:var(--muted);font-weight:400;font-size:11.5px;margin-top:2px}
 .pillbox{display:inline-flex;align-items:center;gap:3px;background:var(--teal-soft);border-radius:999px;padding:3px 11px 3px 7px;min-width:66px;justify-content:center}
 .pillinput{width:48px;border:0;background:transparent;color:var(--teal);font-family:inherit;font-weight:700;font-size:13.5px;text-align:center;outline:0;font-feature-settings:"tnum" 1;padding:2px 0;border-bottom:1.5px dashed rgba(11,110,85,.4);-moz-appearance:textfield}
 .pillinput::-webkit-outer-spin-button,.pillinput::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
@@ -292,6 +295,7 @@ body{font-family:"Tajawal",system-ui,sans-serif;background:var(--paper);color:va
         <div class="rangewrap"><input id="b_newyears" type="range" min="1" max="30" step="1" value="5"><span class="pillbox"><input class="pillinput" type="number" data-range="b_newyears" min="1" max="30" step="1" value="5" inputmode="decimal"><span class="pu">سنة</span></span></div></div>
       <div class="field"><label>رسوم / أتعاب التحويل <span class="hint">(إن وُجدت)</span></label>
         <div class="input"><input id="b_fees" placeholder="0" type="number" inputmode="decimal"><span class="unit">ريال</span></div></div>
+      <label class="chk"><input type="checkbox" id="b_cashout"> <span>تمويل بالحد الأقصى على راتبي + كاش إضافي <span class="hint">(البنك يموّلني أكثر، يسدّد مديونيتي، والباقي كاش)</span></span></label>
     </div>
     <div id="grpSal" class="hidden">
       <div style="font-family:'Tajawal';font-weight:800;color:var(--ink);margin:2px 0 10px">راتبك</div>
@@ -395,6 +399,7 @@ let saveTimer=null;
 function save(){
   try{
     const d={emp,ftype,mode};
+    d._cashout=$('b_cashout').checked;
     FIELDS.forEach(f=>d[f]=$(f).value);
     localStorage.setItem(STORE,JSON.stringify(d));
     const n=$('savedNote');n.classList.add('show');clearTimeout(saveTimer);
@@ -406,6 +411,7 @@ function load(){
     const raw=localStorage.getItem(STORE);if(!raw)return false;
     const d=JSON.parse(raw);
     FIELDS.forEach(f=>{if(d[f]!==undefined)$(f).value=d[f];});
+    if(d._cashout!==undefined)$('b_cashout').checked=d._cashout;
     if(d.emp)emp=d.emp;if(d.ftype)ftype=d.ftype;if(d.mode)mode=d.mode;
     setEmp(emp,true);setFtype(ftype,true);
     return true;
@@ -415,7 +421,7 @@ function clearAll(){
   try{localStorage.removeItem(STORE);}catch(e){}
   const DEFAULTS={dbr:'33.33',rate:'2',years:'5',p_yield:'8',cA_rate:'1.77',cA_years:'5',cB_rate:'2.20',cB_years:'5',b_newrate:'1.40',b_newyears:'5',s_newrate:'1.40'};
   FIELDS.forEach(f=>{const el=$(f);if(!el)return;el.value=(f in DEFAULTS)?DEFAULTS[f]:'';});
-  setEmp('emp',true);setFtype('personal',true);syncBoxes();linkInit();calc();save();
+  $('b_cashout').checked=false;setEmp('emp',true);setFtype('personal',true);syncBoxes();linkInit();calc();save();
 }
 
 /* ---------- count-up animation ---------- */
@@ -664,6 +670,45 @@ function calcBuy(){
       const y=mo/12, tot=settle*(1+f*y), inst=tot/mo;
       if(inst<=cap+1){ opt={mo,inst,tot,sv:stayTotal-tot,apr:solveR(settle,inst,mo)*12*100,pct:inst/newSalary*100}; break; }
     }
+  }
+  // ---- CASH-OUT mode: max new loan on salary, settle old debt, remainder cash ----
+  if($('b_cashout').checked && newSalary>0){
+    const capM=newSalary*0.3333, m=newN;
+    const maxPrincipal=capM*m/(1+f*newYears), maxTotal=maxPrincipal*(1+f*newYears), coInst=maxTotal/m;
+    const coAPR=solveR(maxPrincipal,coInst,m)*12*100;
+    const cash=maxPrincipal-settle-fees, extraProfit=Math.max(0,(maxPrincipal-settle))*f*newYears, totalProfit=maxTotal-maxPrincipal;
+    $('heroLabel').textContent='الكاش الصافي اللي ينزل لك';animateNum($('heroBig'),Math.max(0,cash));
+    $('m1Lbl').textContent='القسط الجديد';animateNum($('m1'),coInst);
+    $('m2Lbl').textContent='أقصى تمويل';animateNum($('m2'),maxPrincipal);
+    $('m3Lbl').textContent='تكلفة الكاش (أرباح)';animateNum($('m3'),extraProfit);
+    $('chartTitle').textContent='توزيع القرض الجديد: أصل مقابل أرباح';$('chartSub').textContent='قرض واحد كبير يسدّد مديونيتك والباقي كاش.';$('legPaid').classList.add('hidden');
+    drawChart(maxPrincipal,solveR(maxPrincipal,coInst,m),coInst,m,null);
+    const rows=[
+      ['راتبك الحالي',fmt(newSalary)+' ﷼'],
+      ['حد ساما (أقصى قسط 33.33%)',fmt(capM)+' ﷼'],
+      ['أقصى مبلغ تمويل على راتبك',fmt(maxPrincipal)+' ﷼'],
+      ['— يُخصم منه —  ',' '],
+      ['سداد مديونيتك الحالية',fmt(settle)+' ﷼'],
+      ['رسوم/أتعاب التحويل',fmt(fees)+' ﷼'],
+      ['—  ',' '],
+      ['القسط الشهري الجديد',fmt(coInst,0)+' ﷼ ('+(coInst/newSalary*100).toFixed(0)+'%)'],
+      ['مدة القرض الجديد',newN+' شهر'],
+      ['APR الفعلي',coAPR.toFixed(2)+'%'],
+      ['إجمالي أرباح القرض الجديد',fmt(totalProfit)+' ﷼'],
+      ['تكلفة الكاش الإضافي وحده',fmt(extraProfit)+' ﷼'],
+    ];
+    let hh=rowsHTML(rows);
+    const insufficient=cash<0;
+    hh+=`<tr class="${insufficient?'total loss':'total save'}"><td>${insufficient?'العجز (راتبك لا يكفي)':'الكاش الصافي اللي ينزل لك'} <span class="tag">تمويل − مديونية</span></td><td>${cellVal(fmt(Math.abs(cash))+' ﷼')}</td></tr>`;
+    let vv;
+    if(insufficient){
+      vv=`<b style="color:var(--red)">راتبك الحالي لا يكفي لهذا السيناريو</b> — أقصى تمويل على راتبك (${fmt(maxPrincipal,0)}) أقل من مديونيتك (${fmt(settle,0)})، فلا يوجد فائض كاش بهذه المدة/النسبة. جرّب مدة أطول أو نسبة أقل.`;
+    }else{
+      vv=`<b style="color:var(--brass)">تمويل بالحد الأقصى:</b> البنك يموّلك ≈ <b>${fmt(maxPrincipal,0)}</b> ريال على راتبك، يسدّد مديونيتك (${fmt(settle,0)})، وينزل لك <b style="color:var(--teal)">≈ ${fmt(cash,0)} ريال كاش</b>. القسط الجديد ${fmt(coInst,0)} ريال (${(coInst/newSalary*100).toFixed(0)}% من راتبك).`;
+      vv+=`<br><br><b style="color:var(--red)">⚠️ تنبيه:</b> هذا <b>دين جديد كبير</b>. الكاش الإضافي يكلّفك ≈ <b>${fmt(extraProfit,0)}</b> ريال أرباحًا على ${newYears} سنوات. مفيد فقط لو وجّهته لغرض منتج (عقار، استثمار بعائد أعلى من ${coAPR.toFixed(1)}%، أو سداد دين أغلى). كارثة لو للاستهلاك.`;
+    }
+    hh+=`<tr class="verdict"><td colspan="2">${vv}</td></tr>`;
+    $('breakdown').innerHTML=hh;return;
   }
   // hero
   $('heroLabel').textContent=saving>=0?'توفيرك من شراء المديونية':'خسارتك من شراء المديونية';
